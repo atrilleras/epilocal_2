@@ -18,7 +18,7 @@ library(abind)
 library(openxlsx)
 library(incidence)
 rm(list=ls())
-source("replicar_nature/utils/process_covariates_3.r")
+source("replicar_colombia/utils/process_covariates_3.r")
 source("funs_z.R")
 
 # Commandline options and parsing
@@ -64,7 +64,7 @@ cat(sprintf("Running:\nStanModel = %s\nDebug: %s\n",
             StanModel,DEBUG))
 
 ###Subir datos
-datos <-loadWorkbook("replicar_nature/data/datos_colombia.xlsx")
+datos <-loadWorkbook("replicar_colombia/data/datos_colombia.xlsx")
 #d     <- readRDS("d.R")
 #d$DateRep <- as.Date(as.numeric(d$DateRep), origin="1899-12-30")
 d <- read.xlsx(datos,"casos") %>% as.data.frame()
@@ -106,7 +106,7 @@ deaths_by_country = processed_data$deaths_by_country
 reported_cases = processed_data$reported_cases
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
-m = stan_model(paste0('replicar_nature/stan-models/',StanModel,'.stan'))
+m = stan_model(paste0('replicar_colombia/stan-models/',StanModel,'.stan'))
 
 if(DEBUG) {
   fit = sampling(m,data=stan_data,iter=50,warmup=20,chains=10)
@@ -136,38 +136,38 @@ print('Generating mu, rt plots')
 mu = (as.matrix(out$mu))
 colnames(mu) = countries
 g = (mcmc_intervals(mu,prob = .9))
-ggsave(sprintf("replicar_nature/figures/%s-mu.png",filename),g,width=4,height=6)
+ggsave(sprintf("replicar_colombia/figures/%s-mu.png",filename),g,width=4,height=6)
 tmp = lapply(1:length(countries), function(i) (out$Rt_adj[,stan_data$N[i],i]))
 Rt_adj = do.call(cbind,tmp)
 colnames(Rt_adj) = countries
 g = (mcmc_intervals(Rt_adj,prob = .9))
-ggsave(sprintf("replicar_nature/figures/%s-final-rt.png",filename),g,width=4,height=6)
+ggsave(sprintf("replicar_colombia/figures/%s-final-rt.png",filename),g,width=4,height=6)
 
 print("Generate 3-panel plots")
-source('replicar_nature/utils/plot_3_panel.r')
+source('replicar_colombia/utils/plot_3_panel.r')
 make_three_panel_plot(filename)
 
 print('Covars plots')
-source('replicar_nature/utils/covariate_size_effects.r')
+source('replicar_colombia/utils/covariate_size_effects.r')
 plot_covars(filename)
 
 print('Making table')
-source('replicar_nature/utils/make_table.r')
+source('replicar_colombia/utils/make_table.r')
 make_table(filename)
-
-#####crear tablas en Escel
-wb <- createWorkbook(
-  creator = "Me",
-  title = "title here",
-  subject = "this & that",
-  category = "something"
-)
-addWorksheet(wb, "casos")
-writeData(wb,sheet="casos",d)
-addWorksheet(wb, "intervenciones")
-writeData(wb,sheet="intervenciones",interventions)
-addWorksheet(wb, "casos")
-writeData(wb,sheet="casos",incidencia)
-addWorksheet(wb,"si")
-writeData(wb,sheet="si",serial.interval)
-saveWorkbook(wb, "casos_y_muertes.xlsx", overwrite = TRUE)
+# 
+# #####crear tablas en Excel
+# wb <- createWorkbook(
+#   creator = "Me",
+#   title = "title here",
+#   subject = "this & that",
+#   category = "something"
+# )
+# addWorksheet(wb, "casos")
+# writeData(wb,sheet="casos",d)
+# addWorksheet(wb, "intervenciones")
+# writeData(wb,sheet="intervenciones",interventions)
+# addWorksheet(wb, "casos")
+# writeData(wb,sheet="casos",incidencia)
+# addWorksheet(wb,"si")
+# writeData(wb,sheet="si",serial.interval)
+# saveWorkbook(wb, "casos_y_muertes.xlsx", overwrite = TRUE)

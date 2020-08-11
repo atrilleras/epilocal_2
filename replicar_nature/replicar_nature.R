@@ -151,19 +151,3 @@ print('Making table')
 source('replicar_nature/utils/make_table.r')
 make_table(filename)
 
-#####crear tablas en Escel
-wb <- createWorkbook(
-  creator = "Me",
-  title = "title here",
-  subject = "this & that",
-  category = "something"
-)
-addWorksheet(wb, "ifr_by_country")
-writeData(wb,sheet="ifr_by_country",ifr.by.country)
-addWorksheet(wb, "intervenciones")
-writeData(wb,sheet="intervenciones",interventions)
-addWorksheet(wb, "casos")
-writeData(wb,sheet="casos",incidencia)
-addWorksheet(wb,"si")
-writeData(wb,sheet="si",serial.interval)
-saveWorkbook(wb, "datos_nature.xlsx", overwrite = TRUE)
