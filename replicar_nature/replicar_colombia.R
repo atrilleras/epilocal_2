@@ -18,7 +18,7 @@ library(abind)
 library(openxlsx)
 library(incidence)
 rm(list=ls())
-source("replicar_nature/utils/process_covariates_2.r")
+source("replicar_nature/utils/process_covariates_3.r")
 source("funs_z.R")
 
 # Commandline options and parsing
@@ -65,18 +65,21 @@ cat(sprintf("Running:\nStanModel = %s\nDebug: %s\n",
 
 ###Subir datos
 datos <-loadWorkbook("replicar_nature/data/datos_colombia.xlsx")
-d     <- readRDS("d.R")
+#d     <- readRDS("d.R")
 #d$DateRep <- as.Date(as.numeric(d$DateRep), origin="1899-12-30")
+d <- read.xlsx(datos,"casos") %>% as.data.frame()
+d$DateRep <- as.Date(as.numeric(d$DateRep), origin="1899-12-30")
 ifr.by.country <- read.xlsx(datos,"ifr_by_country") %>% as.data.frame()
-interventions  <- read.xlsx(datos,"intervenciones") %>% as.data.frame()
+ifr.by.country$ifr <- as.numeric(ifr.by.country$ifr)
+interventions  <- read.xlsx(datos,"intervenciones_2") %>% as.data.frame()
 interventions$schools_universities <- as.Date(as.numeric(interventions$schools_universities), origin="1899-12-30")
-#interventions$self_isolating_if_ill <- as.Date(as.numeric(interventions$self_isolating_if_ill), origin="1899-12-30")
+interventions$self_isolating_if_ill <- as.Date(as.numeric(interventions$self_isolating_if_ill), origin="1899-12-30")
 interventions$public_events <- as.Date(as.numeric(interventions$public_events), origin="1899-12-30")
 interventions$lockdown <- as.Date(as.numeric(interventions$lockdown), origin="1899-12-30")
-#interventions$social_distancing_encouraged <- as.Date(as.numeric(interventions$social_distancing_encouraged), origin="1899-12-30")
+interventions$social_distancing_encouraged <- as.Date(as.numeric(interventions$social_distancing_encouraged), origin="1899-12-30")
 
 
-serial.interval <-read.xlsx(datos,"si") %>% as.data.frame()
+serial.interval <-read.xlsx(datos,"si_europa") %>% as.data.frame()
 #countries <- data.frame(Regions = ifr.by.country$country)
 countries <- data.frame(Regions=c("Bogota","Cali","Medellin","Barranquilla","Cartagena",
                                   "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino"))
@@ -94,7 +97,7 @@ forecast <- 0 # increase to get correct number of days to simulate
 # Maximum number of days to simulate
 N2 <- (max(d$DateRep) - min(d$DateRep) + 1 + forecast)[[1]]
 
-processed_data <- process_covariates_2(countries = countries, interventions = interventions, 
+processed_data <- process_covariates_3(countries = countries, interventions = interventions, 
                                      d = d , ifr.by.country = ifr.by.country, N2 = N2,serial.interval)
 
 stan_data = processed_data$stan_data
@@ -106,7 +109,7 @@ rstan_options(auto_write = TRUE)
 m = stan_model(paste0('replicar_nature/stan-models/',StanModel,'.stan'))
 
 if(DEBUG) {
-  fit = sampling(m,data=stan_data,iter=40,warmup=20,chains=2)
+  fit = sampling(m,data=stan_data,iter=50,warmup=20,chains=10)
 } else if (FULL) {
   fit = sampling(m,data=stan_data,iter=1800,warmup=1000,chains=5,thin=1,control = list(adapt_delta = 0.99, max_treedepth = 20))
 } else { 
@@ -159,12 +162,12 @@ wb <- createWorkbook(
   subject = "this & that",
   category = "something"
 )
-addWorksheet(wb, "ifr_by_country")
-writeData(wb,sheet="ifr_by_country",ifr.by.country)
+addWorksheet(wb, "casos")
+writeData(wb,sheet="casos",d)
 addWorksheet(wb, "intervenciones")
 writeData(wb,sheet="intervenciones",interventions)
 addWorksheet(wb, "casos")
 writeData(wb,sheet="casos",incidencia)
 addWorksheet(wb,"si")
 writeData(wb,sheet="si",serial.interval)
-saveWorkbook(wb, "datos_nature.xlsx", overwrite = TRUE)
+saveWorkbook(wb, "casos_y_muertes.xlsx", overwrite = TRUE)

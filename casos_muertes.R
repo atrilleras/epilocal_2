@@ -10,7 +10,7 @@ library(cowplot)
 library(openxlsx)
 rm(list=ls())
 source("funs_z.R")
-source("functions.R")
+source("rt_unified/functions.R")
 
 ###Funciones
 numero_casos <- function(base1){
@@ -41,7 +41,7 @@ names(cases) <- epitrix::clean_labels(names(cases))
 cases$departamento_o_distrito <- epitrix::clean_labels(cases$departamento_o_distrito)
 cases$ciudad_de_ubicacion <- epitrix::clean_labels(cases$ciudad_de_ubicacion)
 unique(cases$departamento_o_distrito)
-options(mc.cores=parallel::detectCores())# esta instrucci?n permite que se ejecuten cadenas en paralelo y no en secuencia
+options(mc.cores=parallel::detectCores())# esta instrucción permite que se ejecuten cadenas en paralelo y no en secuencia
 
 ###Bogota
 base1 <- cases%>%filter(departamento_o_distrito=="bogota_d_c")
@@ -139,7 +139,7 @@ bolivar <- bolivar %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="
 bolivar$Deaths[is.na(bolivar$Deaths)] <- 0
 bolivar <- data.frame(bolivar,Country="Bolivar")
 
-###Atl?ntico
+###Atlántico
 base1 <- cases%>%filter(departamento_o_distrito=="atlantico")
 place_cases <- fCleanData(datos = cases,  place = "atlantico", type = "depto")
 death_place <- get_deaths(place_cases)
@@ -149,7 +149,7 @@ atlantico <- atlantico %>% select(date,total,deaths)%>%rename(DateRep="date",Cas
 atlantico$Deaths[is.na(atlantico$Deaths)] <- 0
 atlantico <- data.frame(atlantico,Country="Atlantico")
 
-###Nari?o
+###Nariño
 base1 <- cases%>%filter(departamento_o_distrito=="narino")
 place_cases <- fCleanData(datos = cases,  place = "narino", type = "depto")
 death_place <- get_deaths(place_cases)
