@@ -6,13 +6,15 @@ library(dplyr)
 library(tidyr)
 library(EnvStats)
 
-source('replicar_nature/utils/format_data.r')
-datos2 <-loadWorkbook("replicar_nature/data/datos_nature.xlsx")
+source('replicar_colombia/utils/format_data.r')
+
+datos2 <-loadWorkbook("replicar_colombia/data/datos_colombia.xlsx")
 ifr  <- read.xlsx(datos2,"ifr_by_country") %>% as.data.frame()
+ifr.by.country$ifr <- as.numeric(ifr.by.country$ifr)
 
 make_table <- function(filename){
   
-  load(paste0("replicar_nature/results/", filename,'-stanfit.Rdata'))
+  load(paste0("replicar_colombia/results/", filename,'-stanfit.Rdata'))
   out <- rstan::extract(fit)
   inf_mean_delta <- vector("list", length = 11)
   inf_lower_delta <- vector("list", length = 11)
@@ -92,19 +94,9 @@ make_table <- function(filename){
     upper_model[[i]] <- death.probs[3]
   }
   countries <- c(
-    "Denmark",
-    "Italy",
-    "Germany",
-    "Spain",
-    "United_Kingdom",
-    "France",
-    "Norway",
-    "Belgium",
-    "Austria",
-    "Sweden",
-    "Switzerland",
-    "Total"
-  )
+    "Bogota","Cali","Medellin","Barranquilla","Cartagena",
+    "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino","Total")
+  
   # data frame deaths averted
   df_delta <- data.frame( unlist(mean_delta), unlist(lower_delta),  unlist(upper_delta))
   names(df_delta) <-c('mean', 'lower', 'higher')
@@ -115,7 +107,7 @@ make_table <- function(filename){
   df_delta <- data.frame(apply(signif(df_delta[,1:3],2),2,prettyNum,big.mark=','))
   df_delta['text'] <- paste0(df_delta[,1]," [",df_delta[,2]," - ",df_delta[,3],"]")
   df_delta <- cbind(df_delta, countries)
-  write.csv(df_delta[,c('countries', 'text')], file = paste0('replicar_nature/results/deaths-averted-',filename, '.csv'))
+  write.csv(df_delta[,c('countries', 'text')], file = paste0('replicar_colombia/results/deaths-averted-',filename, '.csv'))
   
   # deaths null
   df_null <- data.frame( unlist(mean_null), unlist(lower_null),  unlist(upper_null))
@@ -127,7 +119,7 @@ make_table <- function(filename){
   df_null <- data.frame(apply(signif(df_null[,1:3],2),2,prettyNum,big.mark=','))
   df_null['text'] <- paste0(df_null[,1]," [",df_null[,2]," - ",df_null[,3],"]")
   df_null <- cbind(df_null, countries)
-  write.csv(df_null[,c('countries', 'text')], file = paste0('replicar_nature/results/deaths-null-',filename, '.csv'))
+  write.csv(df_null[,c('countries', 'text')], file = paste0('replicar_colombia/results/deaths-null-',filename, '.csv'))
   
   # deaths model
   df_model <- data.frame( unlist(mean_model), unlist(lower_model),  unlist(upper_model))
@@ -139,7 +131,7 @@ make_table <- function(filename){
   df_model <- data.frame(apply(signif(df_model[,1:3],2),2,prettyNum,big.mark=','))
   df_model['text'] <- paste0(df_model[,1]," [",df_model[,2]," - ",df_model[,3],"]")
   df_model <- cbind(df_model, countries)
-  write.csv(df_model[,c('countries', 'text')], file = paste0('replicar_nature/results/deaths-model-',filename, '.csv'))
+  write.csv(df_model[,c('countries', 'text')], file = paste0('replicar_colombia/results/deaths-model-',filename, '.csv'))
   
   # cases model
   df_model <- data.frame( unlist(inf_mean_model), unlist(inf_lower_model),  unlist(inf_upper_model))
@@ -151,7 +143,7 @@ make_table <- function(filename){
   df_model <- data.frame(apply(signif(df_model[,1:3],2),2,prettyNum,big.mark=','))
   df_model['text'] <- paste0(df_model[,1]," [",df_model[,2]," - ",df_model[,3],"]")
   df_model <- cbind(df_model, countries)
-  write.csv(df_model[,c('countries', 'text')], file = paste0('replicar_nature/results/cases-model-',filename, '.csv'))
+  write.csv(df_model[,c('countries', 'text')], file = paste0('replicar_colombia/results/cases-model-',filename, '.csv'))
   
   df_pop = ifr
   df_pop = df_pop[1:11, c('country', 'popt')]
@@ -169,5 +161,5 @@ make_table <- function(filename){
   df_model <- data.frame(apply(signif(df_model[,1:3],2),2,prettyNum,big.mark=','))
   df_model['text'] <- paste0(df_model[,1]," [",df_model[,2]," - ",df_model[,3],"]")
   df_model <- cbind(df_model, countries)
-  write.csv(df_model[,c('countries', 'text')], file = paste0('replicar_nature/results/per-cases-model-',filename, '.csv'))
+  write.csv(df_model[,c('countries', 'text')], file = paste0('replicar_colombia/results/per-cases-model-',filename, '.csv'))
 }

@@ -18,7 +18,7 @@ library(abind)
 library(openxlsx)
 library(incidence)
 rm(list=ls())
-source("replicar_colombia/utils/process_covariates_3.r")
+source("replicar_colombia/utils/process_covariates_2.r")
 source("funs_z.R")
 
 # Commandline options and parsing
@@ -48,7 +48,7 @@ if(DEBUG && FULL) {
 }
 
 if(length(cmdoptions$args) == 0) {
-  StanModel = 'base-nature'
+  StanModel = 'modelo'
 } else {
   StanModel = cmdoptions$args[1]
 }
@@ -65,21 +65,19 @@ cat(sprintf("Running:\nStanModel = %s\nDebug: %s\n",
 
 ###Subir datos
 datos <-loadWorkbook("replicar_colombia/data/datos_colombia.xlsx")
-#d     <- readRDS("d.R")
-#d$DateRep <- as.Date(as.numeric(d$DateRep), origin="1899-12-30")
-d <- read.xlsx(datos,"casos") %>% as.data.frame()
+d <- read.xlsx(datos,"cases") %>% as.data.frame()
 d$DateRep <- as.Date(as.numeric(d$DateRep), origin="1899-12-30")
 ifr.by.country <- read.xlsx(datos,"ifr_by_country") %>% as.data.frame()
 ifr.by.country$ifr <- as.numeric(ifr.by.country$ifr)
-interventions  <- read.xlsx(datos,"intervenciones_2") %>% as.data.frame()
+interventions  <- read.xlsx(datos,"interventions") %>% as.data.frame()
 interventions$schools_universities <- as.Date(as.numeric(interventions$schools_universities), origin="1899-12-30")
-interventions$self_isolating_if_ill <- as.Date(as.numeric(interventions$self_isolating_if_ill), origin="1899-12-30")
 interventions$public_events <- as.Date(as.numeric(interventions$public_events), origin="1899-12-30")
 interventions$lockdown <- as.Date(as.numeric(interventions$lockdown), origin="1899-12-30")
-interventions$social_distancing_encouraged <- as.Date(as.numeric(interventions$social_distancing_encouraged), origin="1899-12-30")
+#interventions$self_isolating_if_ill <- as.Date(as.numeric(interventions$self_isolating_if_ill), origin="1899-12-30")
+#interventions$social_distancing_encouraged <- as.Date(as.numeric(interventions$social_distancing_encouraged), origin="1899-12-30")
 
 
-serial.interval <-read.xlsx(datos,"si_europa") %>% as.data.frame()
+serial.interval <-read.xlsx(datos,"si_europe") %>% as.data.frame()
 #countries <- data.frame(Regions = ifr.by.country$country)
 countries <- data.frame(Regions=c("Bogota","Cali","Medellin","Barranquilla","Cartagena",
                                   "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino"))
@@ -89,7 +87,6 @@ countries <- data.frame(Regions=c("Bogota","Cali","Medellin","Barranquilla","Car
 #d <- readRDS('nature/data/COVID-19-up-to-date.rds')
 # Read IFR and pop by country
 #ifr.by.country <- readRDS('nature/data/popt-ifr.rds')
-
 # Read interventions
 #interventions <- readRDS('nature/data/interventions.rds')
 
@@ -97,7 +94,7 @@ forecast <- 0 # increase to get correct number of days to simulate
 # Maximum number of days to simulate
 N2 <- (max(d$DateRep) - min(d$DateRep) + 1 + forecast)[[1]]
 
-processed_data <- process_covariates_3(countries = countries, interventions = interventions, 
+processed_data <- process_covariates_2(countries = countries, interventions = interventions, 
                                      d = d , ifr.by.country = ifr.by.country, N2 = N2,serial.interval)
 
 stan_data = processed_data$stan_data
@@ -109,11 +106,11 @@ rstan_options(auto_write = TRUE)
 m = stan_model(paste0('replicar_colombia/stan-models/',StanModel,'.stan'))
 
 if(DEBUG) {
-  fit = sampling(m,data=stan_data,iter=100,warmup=20,chains=10)
+  fit = sampling(m,data=stan_data,iter=50,warmup=20,chains=2)
 } else if (FULL) {
-  fit = sampling(m,data=stan_data,iter=2000,warmup=1000,chains=4,thin=1,control = list(adapt_delta = 0.99, max_treedepth = 20))
+  fit = sampling(m,data=stan_data,iter=1800,warmup=1000,chains=5,thin=1,control = list(adapt_delta = 0.99, max_treedepth = 20))
 } else { 
-  fit = sampling(m,data=stan_data,iter=800,warmup=300,chains=4,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 10))
+  fit = sampling(m,data=stan_data,iter=600,warmup=300,chains=4,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 10))
 }   
 
 out = rstan::extract(fit)
@@ -127,47 +124,32 @@ if(JOBID == "")
 print(sprintf("Jobid = %s",JOBID))
 
 countries <- countries$Regions
-save(fit,prediction,dates,reported_cases,deaths_by_country,countries,estimated.deaths,estimated.deaths.cf,stan_data, file=paste0('replicar_nature/results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
+save(fit,prediction,dates,reported_cases,deaths_by_country,countries,estimated.deaths,estimated.deaths.cf,stan_data, file=paste0('replicar_colombia/results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
 
 #definir el objeto
 filename <- paste0(StanModel,'-',JOBID)
 
-print('Generating mu, rt plots')
-mu = (as.matrix(out$mu))
-colnames(mu) = countries
-g = (mcmc_intervals(mu,prob = .9))
-ggsave(sprintf("replicar_colombia/figures/%s-mu.png",filename),g,width=4,height=6)
-tmp = lapply(1:length(countries), function(i) (out$Rt_adj[,stan_data$N[i],i]))
-Rt_adj = do.call(cbind,tmp)
-colnames(Rt_adj) = countries
-g = (mcmc_intervals(Rt_adj,prob = .9))
-ggsave(sprintf("replicar_colombia/figures/%s-final-rt.png",filename),g,width=4,height=6)
-
-print("Generate 3-panel plots")
-source('replicar_colombia/utils/plot_3_panel.r')
-make_three_panel_plot(filename)
-
-print('Covars plots')
-source('replicar_colombia/utils/covariate_size_effects.r')
-plot_covars(filename)
-
 print('Making table')
 source('replicar_colombia/utils/make_table.r')
 make_table(filename)
+
+# print('Generating mu, rt plots')
+# mu = (as.matrix(out$mu))
+# colnames(mu) = countries
+# g = (mcmc_intervals(mu,prob = .9))
+# ggsave(sprintf("replicar_colombia/figures/%s-mu.png",filename),g,width=4,height=6)
+# tmp = lapply(1:length(countries), function(i) (out$Rt_adj[,stan_data$N[i],i]))
+# Rt_adj = do.call(cbind,tmp)
+# colnames(Rt_adj) = countries
+# g = (mcmc_intervals(Rt_adj,prob = .9))
+# ggsave(sprintf("replicar_colombia/figures/%s-final-rt.png",filename),g,width=4,height=6)
 # 
-# #####crear tablas en Excel
-# wb <- createWorkbook(
-#   creator = "Me",
-#   title = "title here",
-#   subject = "this & that",
-#   category = "something"
-# )
-# addWorksheet(wb, "casos")
-# writeData(wb,sheet="casos",d)
-# addWorksheet(wb, "intervenciones")
-# writeData(wb,sheet="intervenciones",interventions)
-# addWorksheet(wb, "casos")
-# writeData(wb,sheet="casos",incidencia)
-# addWorksheet(wb,"si")
-# writeData(wb,sheet="si",serial.interval)
-# saveWorkbook(wb, "casos_y_muertes.xlsx", overwrite = TRUE)
+# print("Generate 3-panel plots")
+# source('replicar_colombia/utils/plot_3_panel.r')
+# make_three_panel_plot(filename)
+# 
+# print('Covars plots')
+# source('replicar_colombia/utils/covariate_size_effects.r')
+# plot_covars(filename)
+
+
