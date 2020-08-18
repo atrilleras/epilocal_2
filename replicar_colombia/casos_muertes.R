@@ -159,7 +159,197 @@ narino <- narino %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="to
 narino$Deaths[is.na(narino$Deaths)] <- 0
 narino <- data.frame(narino,Country="Narino")
 
+
+###Boyacá
+base1 <- cases%>%filter(departamento_o_distrito=="boyaca")
+place_cases <- fCleanData(datos = cases,  place = "boyaca", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+boyaca <- left_join(casos,death_place, by = c("date"))
+boyaca <- boyaca %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+boyaca$Deaths[is.na(boyaca$Deaths)] <- 0
+boyaca <- data.frame(boyaca,Country="Boyaca")
+
+
+###Caquetá
+base1 <- cases%>%filter(departamento_o_distrito=="caqueta")
+place_cases <- fCleanData(datos = cases,  place = "caqueta", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+caqueta <- left_join(casos,death_place, by = c("date"))
+caqueta <- caqueta %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+caqueta$Deaths[is.na(caqueta$Deaths)] <- 0
+caqueta <- data.frame(caqueta,Country="Caqueta")
+
+
+###Cauca
+base1 <- cases%>%filter(departamento_o_distrito=="cauca")
+place_cases <- fCleanData(datos = cases,  place = "cauca", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+cauca <- left_join(casos,death_place, by = c("date"))
+cauca <- cauca %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+cauca$Deaths[is.na(cauca$Deaths)] <- 0
+cauca <- data.frame(cauca,Country="Cauca")
+
+###Cesar
+base1 <- cases%>%filter(departamento_o_distrito=="cesar")
+place_cases <- fCleanData(datos = cases,  place = "cesar", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+cesar <- left_join(casos,death_place, by = c("date"))
+cesar <- cesar %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+cesar$Deaths[is.na(cesar$Deaths)] <- 0
+cesar <- data.frame(cesar,Country="cesar")
+
+###Chocó
+base1 <- cases%>%filter(departamento_o_distrito=="choco")
+place_cases <- fCleanData(datos = cases,  place = "choco", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+choco <- left_join(casos,death_place, by = c("date"))
+choco <- choco %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+choco$Deaths[is.na(choco$Deaths)] <- 0
+choco <- data.frame(choco,Country="Choco")
+
+###Huila
+base1 <- cases%>%filter(departamento_o_distrito=="huila")
+place_cases <- fCleanData(datos = cases,  place = "huila", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+huila <- left_join(casos,death_place, by = c("date"))
+huila <- huila %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+huila$Deaths[is.na(huila$Deaths)] <- 0
+huila <- data.frame(huila,Country="Huila")
+
+
+##La Guajira
+base1 <- cases%>%filter(departamento_o_distrito=="la_guajira")
+place_cases <- fCleanData(datos = cases,  place = "la_guajira", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+la_guajira <- left_join(casos,death_place, by = c("date"))
+la_guajira <- la_guajira %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+la_guajira$Deaths[is.na(la_guajira$Deaths)] <- 0
+la_guajira <- data.frame(la_guajira,Country="la_guajira")
+
+
+##Meta
+base1 <- cases%>%filter(departamento_o_distrito=="meta")
+place_cases <- fCleanData(datos = cases,  place = "meta", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+meta <- left_join(casos,death_place, by = c("date"))
+meta <- meta %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+meta$Deaths[is.na(meta$Deaths)] <- 0
+meta <- data.frame(meta,Country="meta")
+
+
+##Norte de Santander
+base1 <- cases%>%filter(departamento_o_distrito=="norte_de_santander")
+place_cases <- fCleanData(datos = cases,  place = "norte_de_santander", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+norte_de_santander <- left_join(casos,death_place, by = c("date"))
+norte_de_santander <- norte_de_santander %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+norte_de_santander$Deaths[is.na(norte_de_santander$Deaths)] <- 0
+norte_de_santander <- data.frame(norte_de_santander,Country="Norte_de_santander")
+
+
+##Putumayo
+base1 <- cases%>%filter(departamento_o_distrito=="putumayo")
+place_cases <- fCleanData(datos = cases,  place = "putumayo", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+putumayo <- left_join(casos,death_place, by = c("date"))
+putumayo <- putumayo %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+putumayo$Deaths[is.na(putumayo$Deaths)] <- 0
+putumayo <- data.frame(putumayo,Country="Putumayo")
+
+
+##Risaralda
+base1 <- cases%>%filter(departamento_o_distrito=="risaralda")
+place_cases <- fCleanData(datos = cases,  place = "risaralda", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+risaralda <- left_join(casos,death_place, by = c("date"))
+risaralda <- risaralda %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+risaralda$Deaths[is.na(risaralda$Deaths)] <- 0
+risaralda <- data.frame(risaralda,Country="risaralda")
+
+
+##Santander
+base1 <- cases%>%filter(departamento_o_distrito=="santander")
+place_cases <- fCleanData(datos = cases,  place = "santander", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+santander <- left_join(casos,death_place, by = c("date"))
+santander <- santander %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+santander$Deaths[is.na(santander$Deaths)] <- 0
+santander <- data.frame(santander,Country="santander")
+
+
+##Tolima
+base1 <- cases%>%filter(departamento_o_distrito=="tolima")
+place_cases <- fCleanData(datos = cases,  place = "tolima", type = "depto")
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(base1)
+tolima <- left_join(casos,death_place, by = c("date"))
+tolima <- tolima %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+tolima$Deaths[is.na(tolima$Deaths)] <- 0
+tolima <- data.frame(tolima,Country="Tolima")
+
+
+###Magdalena
+magdalena_1 <- cases%>%filter(departamento_o_distrito=="magdalena")
+magdalena_2 <- cases%>%filter(departamento_o_distrito=="santa_marta_d_t_y_c")
+datos <-bind_rows(magdalena_1,magdalena_2)
+place_cases <- fCleanData_2(datos)
+death_place <- get_deaths(place_cases)
+casos <- numero_casos(datos)
+magdalena <- left_join(casos,death_place, by = c("date"))
+magdalena <- magdalena %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+magdalena$Deaths[is.na(magdalena$Deaths)] <- 0
+magdalena <- data.frame(magdalena,Country="Magdalena")
+
+
+# ## Córdoba
+# base1 <- cases%>%filter(departamento_o_distrito=="cordoba")
+# place_cases <- fCleanData(datos = cases,  place = "cordoba", type = "depto")
+# death_place <- get_deaths(place_cases)
+# death_place <- get_deaths(place_cases)
+# casos <- numero_casos(base1)
+# cordoba <- left_join(casos,death_place, by = c("date"))
+# cordoba <- tolima %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+# cordoba$Deaths[is.na(cordoba$Deaths)] <- 0
+# cordoba <- data.frame(cordoba,Country="cordoba")
+# 
+# 
+# ## Sucre
+# base1 <- cases%>%filter(departamento_o_distrito=="sucre")
+# place_cases <- fCleanData(datos = cases,  place = "sucre", type = "depto")
+# death_place <- get_deaths(place_cases)
+# death_place <- get_deaths(place_cases)
+# casos <- numero_casos(base1)
+# sucre <- left_join(casos,death_place, by = c("date"))
+# sucre <- sucre %>% select(date,total,deaths)%>%rename(DateRep="date",Cases="total",Deaths="deaths")
+# sucre$Deaths[is.na(sucre$Deaths)] <- 0
+# sucre <- data.frame(sucre,Country="sucre")
+
 d <- bind_rows(bogota,Cali,medellin,barranquilla,cartagena,cundinamarca,Valle,antioquia,bolivar,atlantico,narino)
-d <- saveRDS(d,"d.R") 
+
+d_2 <- bind_rows(boyaca,caqueta,cauca,cesar,choco,huila,la_guajira,magdalena,meta,norte_de_santander,putumayo,risaralda,santander,tolima)
+
+
+#####crear tablas en Excel
+wb <- createWorkbook(
+  creator = "Me",
+  title = "title here",
+  subject = "this & that",
+  category = "something"
+)
+addWorksheet(wb, "casos")
+writeData(wb,sheet="casos",d_2)
+saveWorkbook(wb, "casos_y_muertes_2.xlsx", overwrite = TRUE)
 
 
