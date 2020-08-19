@@ -69,7 +69,7 @@ process_covariates_2 <- function(countries, interventions, d, ifr.by.country,N2,
       N2 = N
       forecast = N2 - N
     }
-    
+  
     # IFR is the overall probability of dying given infection
     convolution = function(u) (IFR * ecdf.saved(u))
     

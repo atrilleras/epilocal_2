@@ -93,10 +93,14 @@ make_table <- function(filename){
     lower_model[[i]] <- death.probs[1]
     upper_model[[i]] <- death.probs[3]
   }
-  countries <- c(
-    "Bogota","Cali","Medellin","Barranquilla","Cartagena",
-    "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino","Total")
+  # countries <- c(
+  #   "Bogota","Cali","Medellin","Barranquilla","Cartagena",
+  #   "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino","Total")
   
+  countries <- c(c("Bogota","Cali","Medellin","Barranquilla","Cartagena",
+                   "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino",
+                   "Boyaca","Caqueta","Cauca","Cesar","Choco","Huila","Guajira","Magdalena",
+                   "Meta","Putumayo","Risaralda","Nortsantander","Santander","Tolima","Total"))
   # data frame deaths averted
   df_delta <- data.frame( unlist(mean_delta), unlist(lower_delta),  unlist(upper_delta))
   names(df_delta) <-c('mean', 'lower', 'higher')

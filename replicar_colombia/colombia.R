@@ -64,8 +64,8 @@ cat(sprintf("Running:\nStanModel = %s\nDebug: %s\n",
             StanModel,DEBUG))
 
 ###Subir datos
-datos <-loadWorkbook("replicar_colombia/data/datos_colombia.xlsx")
-d <- read.xlsx(datos,"cases") %>% as.data.frame()
+datos <-loadWorkbook("replicar_colombia/data/datos_colombia_2.xlsx")
+d <- read.xlsx(datos,"total_cases") %>% as.data.frame()
 d$DateRep <- as.Date(as.numeric(d$DateRep), origin="1899-12-30")
 ifr.by.country <- read.xlsx(datos,"ifr_by_country") %>% as.data.frame()
 ifr.by.country$ifr <- as.numeric(ifr.by.country$ifr)
@@ -80,7 +80,16 @@ interventions$lockdown <- as.Date(as.numeric(interventions$lockdown), origin="18
 serial.interval <-read.xlsx(datos,"si_europe") %>% as.data.frame()
 #countries <- data.frame(Regions = ifr.by.country$country)
 countries <- data.frame(Regions=c("Bogota","Cali","Medellin","Barranquilla","Cartagena",
-                                  "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino"))
+                                    "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino",
+                                  "Boyaca","Caqueta","Cauca","Cesar","Choco","Huila","Guajira","Magdalena",
+                                  "Meta","Putumayo","Risaralda","Nortsantander","Santander","Tolima"))
+# countries <- data.frame(Regions=c("Bogota","Cali","Medellin","Barranquilla","Cartagena",
+#                                   "Cundinamarca","Valle","Antioquia","Bolivar","Atlantico","Narino",
+#                                   "Boyaca","Caqueta","Cauca","Cesar","Choco","Huila","Guajira","Magdalena",
+#                                   "Meta","Norte_de_santander","Putumayo","Risaralda","Santander"))
+
+#countries <- data.frame(Regions=c("Boyaca","Caqueta","Cauca","Cesar","Choco","Huila","Guajira","Magdalena",
+#                                 "Meta","Norte_de_santander","Putumayo"))
 # Read which countires to use
 #countries <- readRDS('nature/data/regions.rds')
 # Read deaths data for regions
@@ -106,11 +115,11 @@ rstan_options(auto_write = TRUE)
 m = stan_model(paste0('replicar_colombia/stan-models/',StanModel,'.stan'))
 
 if(DEBUG) {
-  fit = sampling(m,data=stan_data,iter=50,warmup=20,chains=2)
+  fit = sampling(m,data=stan_data,iter=70,warmup=20,chains=2)
 } else if (FULL) {
   fit = sampling(m,data=stan_data,iter=1800,warmup=1000,chains=5,thin=1,control = list(adapt_delta = 0.99, max_treedepth = 20))
 } else { 
-  fit = sampling(m,data=stan_data,iter=600,warmup=300,chains=4,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 10))
+  fit = sampling(m,data=stan_data,iter=800,warmup=300,chains=4,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 10))
 }   
 
 out = rstan::extract(fit)
